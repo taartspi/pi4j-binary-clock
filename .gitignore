@@ -1,0 +1,17 @@
+/.idea/
+/target/
+*.html
+type*
+*.js
+resources/*
+jquery/*
+element-list
+stylesheet.css
+*.zip
+/JavaDoc/
+*.iml
+config_chipMap.properties
+config_pi_pins.properties
+config_pin_map.properties
+*pid*.log
+.~*
