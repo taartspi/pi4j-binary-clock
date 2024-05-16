@@ -51,14 +51,12 @@ public class BinaryClock {
     /**
      * @param pi4j
      * @param console
-     * @param IntPin   GPIO connected to PCF8575 interrupt line
      * @param bus
      * @param addressOne
      * @param addressTwo
      * @param traceLevel
      */
-    public BinaryClock(Context pi4j, Console console, int IntPin, int bus, int addressOne, int addressTwo, String traceLevel) throws InterruptedException {
-        this.IntPinNum = IntPin;
+    public BinaryClock(Context pi4j, Console console, int bus, int addressOne, int addressTwo, String traceLevel) throws InterruptedException {
         this.traceLevel = traceLevel;
         this.busNum = bus;
         this.addressOne = addressOne;
@@ -76,25 +74,11 @@ public class BinaryClock {
         System.setProperty("org.slf4j.simpleLogger.log." + BinaryClock.class.getName(), this.traceLevel);
         this.logger = LoggerFactory.getLogger(BinaryClock.class);
 
-        this.logger.trace("Interrupt Pin  " + this.IntPinNum);
 
 
         this.pcfDevOne = this.createI2cDevice(this.addressOne);
         this.pcfDevTwo = this.createI2cDevice(this.addressTwo);
 
-
-        var inputConfig1 = DigitalInput.newConfigBuilder(pi4j)
-            .id("INT_pin")
-            .name("Interrupt")
-            .address(this.IntPinNum)
-            .provider("gpiod-digital-input");
-        try {
-            this.IntPin = pi4j.create(inputConfig1);
-        } catch (Exception e) {
-            e.printStackTrace();
-            console.println("create DigIn Interrupt failed");
-            System.exit(201);
-        }
 
         // Set all pins to  '1'. LED off
         this.configAllPinInput(this.pcfDevOne);
@@ -261,13 +245,11 @@ public class BinaryClock {
         int busNum = DEFAULT_BUS;
         int addressOne = DEFAULT_ADDRESS_ONE;
         int addressTwo = DEFAULT_ADDRESS_TWO;
-        int IntPin = 0xff;
-        boolean doReset = false;
 
 
         console.title("<-- The Pi4J V2 Project Extension  -->", "Binary Clock");
-        String helpString = " parms: BinaryClock  -b hex value bus    -a1 hex value first MCP address  " +
-            "-a2 hex value second MCP address -t trace   -i IntPin   \n" +
+        String helpString = " parms: BinaryClock  -b hex value bus    -a1 hex address value first PCF (Second/Hour)  " +
+            "-a2 hex address  value second PCF (Hours) -t trace     \n" +
             "-t  trace values : \"trace\", \"debug\", \"info\", \"warn\", \"error\" \n " +
             " or \"off\"  Default \"info\" \n";
 
@@ -286,11 +268,7 @@ public class BinaryClock {
                 String a = args[i + 1];
                 i++;
                 addressTwo = Integer.parseInt(a.substring(2), 16);
-            } else if (o.contentEquals("-i")) {
-                String a = args[i + 1];
-                IntPin = Integer.parseInt(a);
-                i++;
-            }  else if (o.contentEquals("-t")) {
+            } else if (o.contentEquals("-t")) {
                 String a = args[i + 1];
                 i++;
                 traceLevel = a;
@@ -318,7 +296,7 @@ public class BinaryClock {
         pi4j.providers().describe().print(System.out);
         System.out.println("----------------------------------------------------------");
 
-        BinaryClock dispObj = new BinaryClock(pi4j, console, IntPin, busNum, addressOne, addressTwo, traceLevel);
+        BinaryClock dispObj = new BinaryClock(pi4j, console, busNum, addressOne, addressTwo, traceLevel);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
