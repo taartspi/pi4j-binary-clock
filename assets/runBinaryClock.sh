@@ -7,7 +7,7 @@
 #      * **********************************************************************
 #      * ORGANIZATION  :  Pi4J
 #      * PROJECT       :  Pi4J :: EXTENSION
-#      * FILENAME      :  runBMP280I2C.sh
+#      * FILENAME      :  runBinaryClock.sh
 #      *
 #      * This file is part of the Pi4J project. More information about
 #      * this project can be found here:  https://pi4j.com/
@@ -32,4 +32,4 @@
 #
 #
 
-java --module-path . --module  com.pi4j.devices/com.pi4j.devices.bmp280.BMP280I2cExample  "$@"
+java --module-path . --module  com.pi4j.binaryClock/com.pi4j.binaryClock.BinaryClock  "$@"
