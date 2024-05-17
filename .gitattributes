@@ -1,8 +1,8 @@
 #The pdf files will be stored as binary, no attempt to create a delta from the previous version.
 
 *.pdf binary
-*.odt
-*.png
-*.jpg
-*.MOV
+*.odt binary
+*.png binary
+*.jpg binary
+*.MOV binary
 
