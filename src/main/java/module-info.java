@@ -24,6 +24,6 @@ module com.pi4j.devices{
 
     // allow access to these classes
 
-    exports com.pi4j.binaryClock;
+    exports com.pi4j.devices.binaryClock;
 
     }
