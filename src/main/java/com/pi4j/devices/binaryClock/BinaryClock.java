@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /*
 pcfDevOne  Byte one, Seconds LED
@@ -50,7 +52,7 @@ pcfDevTwo  Byte one, hours LEDs
 
 
  */
-public class BinaryClock {
+public class BinaryClock  extends TimerTask {
 
     private I2C pcfDevOne = null;
     private I2C pcfDevTwo = null;
@@ -68,7 +70,7 @@ public class BinaryClock {
     private byte currentSecond;
     private byte currentMinute;
     private byte currentHour;
-
+private int interval;
 
     private static final int DEFAULT_ADDRESS_ONE = 0x24;
     private static final int DEFAULT_ADDRESS_TWO = 0x22;
@@ -147,15 +149,9 @@ public class BinaryClock {
     }
 
 
-    public void countSeconds() throws InterruptedException {
-        while (true) {
-            Thread.sleep(1000);
-            this.incrementSeconds();
-        }
 
-    }
 
-    byte dec2bcd(int num) {
+    private byte dec2bcd(int num) {
         int ones = 0;
         int tens = 0;
         int temp = 0;
@@ -207,6 +203,8 @@ public class BinaryClock {
         this.currentHour++;
         if (this.currentHour > 12) {
             this.currentHour = 1;
+            // Possibly the one second time drifted, so reset the time
+            this.initTimes();
         }
         byte[] data = new byte[2];
         data[0] = this.dec2bcd(this.currentHour);
@@ -322,7 +320,7 @@ public class BinaryClock {
         pi4j.providers().describe().print(System.out);
         System.out.println("----------------------------------------------------------");
 
-        BinaryClock dispObj = new BinaryClock(pi4j, console, busNum, addressOne, addressTwo, traceLevel);
+       // BinaryClock dispObj = new BinaryClock(pi4j, console, busNum, addressOne, addressTwo, traceLevel);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -335,11 +333,14 @@ public class BinaryClock {
             }
         });
 
-        dispObj.countSeconds();
-
-        Thread.sleep(5000);
+        Timer timer = new Timer();
+        timer.schedule(new BinaryClock(pi4j, console, busNum, addressOne, addressTwo, traceLevel), 1000, 1000);
 
     }
 
 
+    @Override
+    public void run() {
+            this.incrementSeconds();
+    }
 }
